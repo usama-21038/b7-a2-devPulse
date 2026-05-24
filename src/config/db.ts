@@ -43,7 +43,7 @@ export const initDB=async ()=>{
     }
 }
 
-// Connection Pool তৈরি - প্রতিটি request-এ নতুন connection না খুলে pool ব্যবহার করা হয়
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });

@@ -32,7 +32,7 @@ export const signup = async (
       return;
     }
 
-    next(error); // unhandled error global handler-এ পাঠানো হচ্ছে
+    next(error); 
   }
 };
 

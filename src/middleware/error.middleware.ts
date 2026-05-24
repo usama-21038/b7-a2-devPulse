@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-// Centralized error handling middleware - সব async/sync error এখানে আসে
+
 export const errorMiddleware = (
   err: Error,
   req: Request,
   res: Response,
-  next: NextFunction // eslint-disable-line @typescript-eslint/no-unused-vars
+  next: NextFunction 
 ): void => {
   console.error('Error:', err.message);
 

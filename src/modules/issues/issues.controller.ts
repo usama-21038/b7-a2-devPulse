@@ -23,7 +23,7 @@ export const createIssueController = async (
       return;
     }
 
-    // reporter_id টি JWT থেকে নেওয়া হচ্ছে, request body থেকে নয়
+   
     const reporterId = req.user!.id;
     const issue = await createIssue({ title, description, type, reporterId });
     sendSuccess(res, StatusCodes.CREATED, 'Issue created successfully', issue);

@@ -13,7 +13,7 @@ interface UpdateIssueInput {
   type?: string;
 }
 
-// Reporter-এর তথ্য আলাদা query করে আনার helper function
+
 const fetchReporter = async (reporterId: number) => {
   const result = await pool.query(
     'SELECT id, name, role FROM users WHERE id = $1',
@@ -22,7 +22,7 @@ const fetchReporter = async (reporterId: number) => {
   return result.rows[0] || null;
 };
 
-// নতুন issue তৈরি
+
 export const createIssue = async (input: CreateIssueInput) => {
   const { title, description, type, reporterId } = input;
 
@@ -37,7 +37,7 @@ export const createIssue = async (input: CreateIssueInput) => {
     throw new Error('DESCRIPTION_TOO_SHORT');
   }
 
-  // reporter_id validate - application logic দিয়ে
+ 
   const userCheck = await pool.query('SELECT id FROM users WHERE id = $1', [reporterId]);
   if (userCheck.rows.length === 0) {
     throw new Error('REPORTER_NOT_FOUND');
@@ -53,13 +53,13 @@ export const createIssue = async (input: CreateIssueInput) => {
   return result.rows[0];
 };
 
-// সব issue পাওয়া (filter + sort সহ)
+
 export const getAllIssues = async (
   sort: string = 'newest',
   type?: string,
   status?: string
 ) => {
-  // Dynamic WHERE clause তৈরি করা
+
   const conditions: string[] = [];
   const values: string[] = [];
   let paramIndex = 1;
@@ -85,21 +85,20 @@ export const getAllIssues = async (
 
   if (issues.length === 0) return [];
 
-  // JOIN ছাড়াই reporter data আনা - batch query ব্যবহার করে
-  // সব unique reporter_id নিয়ে একটাই query করা হচ্ছে
+  
   const reporterIds = [...new Set(issues.map((i) => i.reporter_id))];
   const reportersResult = await pool.query(
     'SELECT id, name, role FROM users WHERE id = ANY($1::int[])',
     [reporterIds]
   );
 
-  // reporter গুলোকে map করা দ্রুত lookup-এর জন্য
+  
   const reporterMap: Record<number, { id: number; name: string; role: string }> = {};
   reportersResult.rows.forEach((r) => {
     reporterMap[r.id] = r;
   });
 
-  // issues-এর সাথে reporter মিলানো
+  
   return issues.map((issue) => {
     const { reporter_id, ...rest } = issue;
     return {
@@ -109,7 +108,7 @@ export const getAllIssues = async (
   });
 };
 
-// একটি issue পাওয়া
+
 export const getIssueById = async (id: number) => {
   const result = await pool.query('SELECT * FROM issues WHERE id = $1', [id]);
 
@@ -124,14 +123,14 @@ export const getIssueById = async (id: number) => {
   return { ...rest, reporter };
 };
 
-// Issue update করা
+
 export const updateIssue = async (
   issueId: number,
   requesterId: number,
   requesterRole: string,
   input: UpdateIssueInput
 ) => {
-  // আগে issue খোঁজা
+  
   const issueResult = await pool.query('SELECT * FROM issues WHERE id = $1', [issueId]);
 
   if (issueResult.rows.length === 0) {
@@ -140,9 +139,7 @@ export const updateIssue = async (
 
   const issue = issueResult.rows[0];
 
-  // Permission check:
-  // - contributor শুধু নিজের issue update করতে পারবে এবং শুধু 'open' থাকলে
-  // - maintainer যেকোনো issue update করতে পারবে
+
   if (requesterRole === 'contributor') {
     if (issue.reporter_id !== requesterId) {
       throw new Error('FORBIDDEN');
@@ -163,7 +160,7 @@ export const updateIssue = async (
     throw new Error('DESCRIPTION_TOO_SHORT');
   }
 
-  // শুধু যে field গুলো পাঠানো হয়েছে সেগুলোই update করা
+  
   const updates: string[] = [];
   const values: (string | number)[] = [];
   let paramIndex = 1;
@@ -192,7 +189,7 @@ export const updateIssue = async (
   return result.rows[0];
 };
 
-// Issue delete করা (শুধু maintainer)
+
 export const deleteIssue = async (issueId: number) => {
   const result = await pool.query(
     'DELETE FROM issues WHERE id = $1 RETURNING id',

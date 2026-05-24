@@ -3,14 +3,14 @@ import jwt from 'jsonwebtoken';
 import { StatusCodes } from 'http-status-codes';
 import { sendError } from '../utils/response';
 
-// JWT payload এর ধরন define করা হচ্ছে
+
 export interface JwtPayload {
   id: number;
   name: string;
   role: string;
 }
 
-// Express এর Request type-এ user যোগ করা হচ্ছে
+
 declare global {
   namespace Express {
     interface Request {
@@ -19,7 +19,7 @@ declare global {
   }
 }
 
-// Token যাচাই করার middleware
+
 export const authenticate = (
   req: Request,
   res: Response,
@@ -35,14 +35,14 @@ export const authenticate = (
   try {
     const secret = process.env.JWT_SECRET as string;
     const decoded = jwt.verify(token, secret) as JwtPayload;
-    req.user = decoded; // decoded payload টি request এ attach করা হলো
+    req.user = decoded; 
     next();
   } catch {
     sendError(res, StatusCodes.UNAUTHORIZED, 'Invalid or expired token');
   }
 };
 
-// শুধুমাত্র maintainer রোলের জন্য permission check
+
 export const requireMaintainer = (
   req: Request,
   res: Response,

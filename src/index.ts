@@ -19,7 +19,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/issues', issueRoutes);
 
-// Global Error Handler (সবার শেষে থাকবে)
+
 app.use(errorMiddleware);
 
 app.listen(PORT, () => {

@@ -1,6 +1,6 @@
 import { Response } from 'express';
 
-// Success response পাঠানোর utility function
+
 export const sendSuccess = (
   res: Response,
   statusCode: number,
@@ -14,7 +14,7 @@ export const sendSuccess = (
   });
 };
 
-// Error response পাঠানোর utility function
+
 export const sendError = (
   res: Response,
   statusCode: number,
